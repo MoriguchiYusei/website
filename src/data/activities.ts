@@ -21,8 +21,8 @@ export interface Activity {
 
 // 継続的に主催しているセミナー・研究集会など
 export const organized: OrganizedSeries[] = [
-  { title: '〇〇セミナー', url: 'https://example.com/', note: '〇〇に興味のある方を歓迎します' },
-  { title: '〇〇勉強会' },
+  { title: '数物セミナー', url: 'https://suubutsuseminar.com/'},
+  { title: 'すうがく徒のつどい', url: 'https://math-tsudoi.jp/' },
 ];
 
 // 参加・講演・主催したイベント

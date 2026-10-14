@@ -1,0 +1,42 @@
+---
+import 'katex/dist/katex.min.css';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  frontmatter?: { title?: string };
+}
+
+const siteName = 'Yusei Moriguchi';
+const pageTitle = Astro.props.title ?? Astro.props.frontmatter?.title;
+const fullTitle = pageTitle ? `${pageTitle} | ${siteName}` : siteName;
+
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const nav = [
+  { href: `${base}/`, label: 'Home' },
+  { href: `${base}/research/`, label: 'Research' },
+  { href: `${base}/activities/`, label: 'Activities' },
+  { href: `${base}/cv/`, label: 'CV' },
+];
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+  </head>
+  <body>
+    <header>
+      <a class="site-name" href={`${base}/`}>{siteName}</a>
+      <nav>
+        {nav.map((item) => <a href={item.href}>{item.label}</a>)}
+      </nav>
+    </header>
+    <main>
+      <slot />
+    </main>
+    <footer>© {new Date().getFullYear()} {siteName}</footer>
+  </body>
+</html>

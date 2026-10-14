@@ -1,0 +1,107 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { activities, organized, type Activity, type Role } from '../data/activities';
+
+const roleLabel: Record<Role, string> = {
+  talk: '講演',
+  organizer: '主催',
+};
+
+function parse(date: string) {
+  const [y, m, d] = date.split('-').map(Number);
+  return { y, m, d };
+}
+
+// 例: "1月12–15日", "5月29日–6月7日", "7月9日"
+function formatRange({ start, end }: Activity): string {
+  const s = parse(start);
+  if (!end) return `${s.m}月${s.d}日`;
+  const e = parse(end);
+  if (s.y === e.y && s.m === e.m) return `${s.m}月${s.d}–${e.d}日`;
+  return `${s.m}月${s.d}日–${e.m}月${e.d}日`;
+}
+
+const sorted = [...activities].sort((a, b) => b.start.localeCompare(a.start));
+const byYear = new Map<number, Activity[]>();
+for (const a of sorted) {
+  const year = parse(a.start).y;
+  byYear.set(year, [...(byYear.get(year) ?? []), a]);
+}
+---
+
+<BaseLayout title="活動">
+  <h1>活動</h1>
+
+  <h2>主催</h2>
+  <ol>
+    {
+      organized.map((o) => (
+        <li>
+          {o.url ? <a href={o.url}>{o.title}</a> : o.title}
+          {o.note && <> — {o.note}</>}
+        </li>
+      ))
+    }
+  </ol>
+
+  {
+    [...byYear].map(([year, items]) => (
+      <section>
+        <h2>{year}</h2>
+        <ul class="activities">
+          {items.map((a) => (
+            <li>
+              <span class="date">{formatRange(a)}</span>
+              <div>
+                <span class="title">
+                  {a.url ? <a href={a.url}>{a.title}</a> : a.title}
+                  {a.role && <strong> ({roleLabel[a.role]})</strong>}
+                </span>
+                <span class="venue">{a.venue}</span>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</BaseLayout>
+
+<style>
+  .activities {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .activities li {
+    display: grid;
+    grid-template-columns: 7.5rem 1fr;
+    gap: 0.25rem 1rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .date {
+    color: var(--muted);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+    padding-top: 0.15rem;
+  }
+
+  .title,
+  .venue {
+    display: block;
+  }
+
+  .venue {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 30rem) {
+    .activities li {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
